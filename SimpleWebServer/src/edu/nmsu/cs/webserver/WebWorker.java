@@ -69,6 +69,20 @@ public class WebWorker implements Runnable{
 				writeContent(os, reqFile, "text/html");
 				
 			}
+			if(reqFile.getName().toLowerCase().endsWith("png")){
+				writeHTTPHeader(os, reqFile, "image/png");
+				writeContent(os, reqFile, "image/png");
+			}
+			
+			if(reqFile.getName().toLowerCase().endsWith("gif")){
+				writeHTTPHeader(os, reqFile, "image/gif");
+				writeContent(os, reqFile, "image/gif");
+			}
+			
+			if(reqFile.getName().toLowerCase().endsWith("jpeg") || reqFile.getName().toLowerCase().endsWith("jpg")){
+				writeHTTPHeader(os, reqFile, "image/jpeg");
+				writeContent(os, reqFile, "image/jpeg");
+			}
 			//readHTTPRequest(is);
 			//writeHTTPHeader(os, "text/html");
 			//writeContent(os);
@@ -119,7 +133,7 @@ public class WebWorker implements Runnable{
 				return "404";
 			}
 		}
-		return reqFileName;
+		return "www/" + reqFileName;
 	}
 
 	/**
@@ -135,7 +149,7 @@ public class WebWorker implements Runnable{
 		Date d = new Date();
 		DateFormat df = DateFormat.getDateTimeInstance();
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));
-		int j = 0;
+		int j = 0; // flags instances
 		if(!reqFile.exists()){
 				j = 404;   
 			}//end 
@@ -173,7 +187,7 @@ public class WebWorker implements Runnable{
 	    String fcont = "";
 	    String address = reqFile.toString();
 	    String date = dformat.format(d);
-	    
+	    if(contentType == "text/html") {
 	      try{
 	         FileReader fRead = new FileReader(reqFile);
 
@@ -198,6 +212,20 @@ public class WebWorker implements Runnable{
 	         System.err.println("File not found: " + address);
 	         os.write("HTTP/1.1 404 Not Found\n".getBytes());
 	      } 
+		}
+		else {
+	    	try{
+	    		FileInputStream file = new FileInputStream(reqFile);
+	    		int z = file.available();
+	    		byte[] b = new byte[z];
+	    		file.read(b);
+	    		file.close();
+	    		os.write(b);
+	    	 }catch(FileNotFoundException e) {
+		         System.err.println("File not found: " + address);
+		         os.write("HTTP/1.1 404 Not Found\n".getBytes());
+		      }
+		}	  
 	      
 	}
 
